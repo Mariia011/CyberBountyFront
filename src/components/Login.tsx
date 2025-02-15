@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { useNavigate } from "react-router-dom";
-import loginSchema from "../validation/LoginSchema"; // Import your Joi validation schema
+import loginSchema from "../schemas/LoginSchema"; // Import your Joi validation schema
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const LoginPage: React.FC = () => {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.usernameOrEmail && (
-              <p className="text-red-500 text-sm">{errors.usernameOrEmail.message}</p>
+              <p className="text-red-500 text-sm">{errors.usernameOrEmail.message as string}</p>
             )}
           </div>
 
@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm">{errors.password.message as string}</p>
             )}
           </div>
 
