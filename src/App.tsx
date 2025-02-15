@@ -1,6 +1,6 @@
 import { AppSidebar } from "./components/App-Sidebar"
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
-import Rediraction from "./components/Rediraction"
+import Rediraction from "./components/Redirection"
 function App() {
 
   return (
