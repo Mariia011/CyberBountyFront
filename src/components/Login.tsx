@@ -1,21 +1,27 @@
-// LoginPage.tsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { joiResolver } from "@hookform/resolvers/joi";
+import { useNavigate } from "react-router-dom";
+import loginSchema from "../validation/LoginSchema"; // Import your Joi validation schema
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Use react-hook-form with Joi resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: joiResolver(loginSchema), // Use Joi schema for validation
+  });
 
-    // Simple validation (replace with actual authentication logic)
-    if (username === 'user' && password === 'password') {
-      navigate('/upload'); // Redirect to the file upload page
+  const onSubmit = (data: any) => {
+    // Mock authentication logic: Replace with your actual API logic
+    if ((data.usernameOrEmail === "vle123" || data.usernameOrEmail === "vle@gmail.com")&& data.password === "password123") {
+      navigate("/upload"); // Redirect to the upload page upon successful login
     } else {
-      setError('Invalid username or password');
+      alert("Invalid username or password"); // Show error for failed authentication
     }
   };
 
@@ -23,34 +29,37 @@ const LoginPage: React.FC = () => {
     <div className="flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2" htmlFor="username">
-              Username
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="usernameOrEmail">
+              Username or Email
             </label>
             <input
               type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="usernameOrEmail"
+              {...register("usernameOrEmail")} // Bind input field to Joi schema
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
+            {errors.usernameOrEmail && (
+              <p className="text-red-500 text-sm">{errors.usernameOrEmail.message}</p>
+            )}
           </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2" htmlFor="password">
+
+          <div>
+            <label className="block text-sm font-medium" htmlFor="password">
               Password
             </label>
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")} // Bind password field to Joi schema
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
