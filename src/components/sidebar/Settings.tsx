@@ -70,6 +70,7 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({ groupName, fields, layout
 //
 // 4. Render the complete settings form
 //
+
 interface SettingsGroupConfig {
   groupName: string;
   fields: SettingField[];
