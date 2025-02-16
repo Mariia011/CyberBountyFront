@@ -17,7 +17,7 @@ const Rediraction: React.FC = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/upload" element={<FileUploader />} />
-      <Route path="/History" element={<SidebarHistory />} />
+      <Route path="/history" element={<SidebarHistory />} />
       
       </Routes>
     </Router>
