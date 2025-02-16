@@ -7,7 +7,7 @@ import SidebarSearch from './sidebar/Search';
 import Register from './Register';
 
 
-const Rediraction: React.FC = () => {
+const Redirection: React.FC = () => {
   return (
     <Router>
       <Routes>
@@ -21,4 +21,4 @@ const Rediraction: React.FC = () => {
   );
 };
 
-export default Rediraction;
+export default Redirection;

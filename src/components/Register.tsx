@@ -16,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { AlertDestructive } from "./AlertDestructive";
 
 const formSchema = z.object({
   username: z.string()
@@ -27,7 +29,8 @@ const formSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-  confirmPassword: z.string()
+  confirmPassword: z.string(),
+  key: z.string()
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"]
@@ -40,21 +43,22 @@ const Register: React.FC = () => {
       username: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+			key: ""
     },
   })
 
 	const navigate = useNavigate();
+	const [registerError, setRegisterError] = useState(false);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-
 		try {
 			const payload = {
 				username: values.username,
 				email: values.email,
-				password: values.password,
-				key: 'jan jan hopa hopa'
-			}
+				password:values.password,
+				key: values.key
+			};
 
 			const res = await axios.post(`${BACKEND_API}/auth/register`, payload);
 
@@ -64,7 +68,9 @@ const Register: React.FC = () => {
 		} catch (err) {
 			if (err instanceof AxiosError && err.status === 400) {
 				console.log('User already exists');
+				setRegisterError(p => true);
 			}
+			console.log({ values, err });
 		}
   }
 
@@ -76,6 +82,8 @@ const Register: React.FC = () => {
           Enter your information to create an account
         </p>
       </div>
+
+			{registerError && <AlertDestructive message="You are already registered. Please log in"></AlertDestructive>}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -147,6 +155,24 @@ const Register: React.FC = () => {
                       placeholder="••••••••"
                       {...field}
                       autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+				<FormField
+              control={form.control}
+              name="key"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Public Key</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="ssh 4567897654-AFHGVSJFB"
+                      {...field}
+											autoComplete="public key"
                     />
                   </FormControl>
                   <FormMessage />

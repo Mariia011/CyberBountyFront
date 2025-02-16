@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import axios from 'axios';
+import { BACKEND_API } from "@/constants";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,6 +16,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
+import { useState } from "react";
+import { AlertDestructive } from "./AlertDestructive";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,8 +36,24 @@ const Login: React.FC = () => {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+	const [loginError, setLoginError] = useState(false);
+	const navigate = useNavigate();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+			const payload = {
+				email: values.email,
+				password: values.password
+			};
+
+			const res = await axios.post(`${BACKEND_API}/auth/login`, payload);
+			if (res.status === 201) {
+				navigate('/upload');
+			}
+		} catch(error) {
+			setLoginError(p => true);
+			console.log(error);
+		}
   }
 
   return (
@@ -44,6 +65,8 @@ const Login: React.FC = () => {
         </p>
       </div>
 
+			{loginError && <AlertDestructive message="Invalid credentials"></AlertDestructive>}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
@@ -54,9 +77,9 @@ const Login: React.FC = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="name@example.com" 
-                      {...field} 
+                    <Input
+                      placeholder="name@example.com"
+                      {...field}
                       autoComplete="email"
                     />
                   </FormControl>
