@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import axios, { AxiosError } from 'axios';
+import { BACKEND_API } from "@/constants";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   username: z.string()
@@ -41,8 +44,28 @@ const Register: React.FC = () => {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+	const navigate = useNavigate();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+
+		try {
+			const payload = {
+				username: values.username,
+				email: values.email,
+				password: values.password,
+				key: 'jan jan hopa hopa'
+			}
+
+			const res = await axios.post(`${BACKEND_API}/auth/register`, payload);
+
+			if (res.status === 201) {
+				navigate('/login');
+			}
+		} catch (err) {
+			if (err instanceof AxiosError && err.status === 400) {
+				console.log('User already exists');
+			}
+		}
   }
 
   return (
@@ -64,9 +87,9 @@ const Register: React.FC = () => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="john_doe123" 
-                      {...field} 
+                    <Input
+                      placeholder="john_doe123"
+                      {...field}
                       autoComplete="username"
                     />
                   </FormControl>
@@ -82,9 +105,9 @@ const Register: React.FC = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="name@example.com" 
-                      {...field} 
+                    <Input
+                      placeholder="name@example.com"
+                      {...field}
                       autoComplete="email"
                     />
                   </FormControl>
