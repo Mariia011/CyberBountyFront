@@ -1,75 +1,120 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { joiResolver } from "@hookform/resolvers/joi";
-import { useNavigate } from "react-router-dom";
-import loginSchema from "../schemas/LoginSchema"; // Import your Joi validation schema
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
-const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Card } from "@/components/ui/card"
 
-  // Use react-hook-form with Joi resolver
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: joiResolver(loginSchema), // Use Joi schema for validation
-  });
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  remember: z.boolean().optional()
+})
 
-  const onSubmit = (data: any) => {
-    // Mock authentication logic: Replace with your actual API logic
-    if ((data.usernameOrEmail === "vle123" || data.usernameOrEmail === "vle@gmail.com")&& data.password === "password123") {
-      navigate("/upload"); // Redirect to the upload page upon successful login
-    } else {
-      alert("Invalid username or password"); // Show error for failed authentication
-    }
-  };
+const Login: React.FC = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: false
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
 
   return (
-    <div className="flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium" htmlFor="usernameOrEmail">
-              Username or Email
-            </label>
-            <input
-              type="text"
-              id="usernameOrEmail"
-              {...register("usernameOrEmail")} // Bind input field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.usernameOrEmail && (
-              <p className="text-red-500 text-sm">{errors.usernameOrEmail.message as string}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              {...register("password")} // Bind password field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message as string}</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
-          >
-            Login
-          </button>
-        </form>
+    <Card className="mx-auto max-w-md p-6 space-y-8">
+      <div className="space-y-2 text-center">
+        <h1 className="text-3xl font-bold">Welcome Back</h1>
+        <p className="text-muted-foreground">
+          Enter your credentials to access your account
+        </p>
       </div>
-    </div>
-  );
-};
 
-export default LoginPage;
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="name@example.com" 
+                      {...field} 
+                      autoComplete="email"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      autoComplete="current-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="remember"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <FormLabel className="!mt-0">Remember me</FormLabel>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Button type="submit" className="w-full">
+            Sign In
+          </Button>
+        </form>
+      </Form>
+
+      <div className="text-center text-sm text-muted-foreground">
+        <a
+          href="#"
+          className="underline hover:text-primary"
+        >
+          Forgot your password?
+        </a>
+      </div>
+    </Card>
+  )
+}
+
+export default Login;

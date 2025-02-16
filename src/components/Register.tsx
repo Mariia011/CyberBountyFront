@@ -1,103 +1,154 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { joiResolver } from "@hookform/resolvers/joi";
-import { useNavigate } from "react-router-dom";;
-import RegisterShema from "../schemas/RegisterSchema"; // Import your Joi schema
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+
+const formSchema = z.object({
+  username: z.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be less than 20 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+})
 
 const Register: React.FC = () => {
-  // react-hook-form configuration
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: joiResolver(RegisterShema), // Use Joi resolver for validation
-  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    },
+  })
 
-  const navigate = useNavigate();
-
-  const onSubmit = (data: any) => {
-    // Handle registration logic here, e.g., send data to API
-    console.log("User registered with:", data);
-	navigate("/upload");
-  };
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
 
   return (
-    <div className="flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-medium" htmlFor="username">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              {...register("username")} // Bind input field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.username && (
-              <p className="text-red-500 text-sm">{errors.username.message as string}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              {...register("email")} // Bind email field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message as string}</p>}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              {...register("password")} // Bind password field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message as string}</p>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-medium" htmlFor="confirmPassword">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              {...register("confirmPassword")} // Bind confirm password field to Joi schema
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm">{errors.confirmPassword.message as string}</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
-          >
-            Register
-          </button>
-        </form>
+    <Card className="mx-auto max-w-md p-6 space-y-8">
+      <div className="space-y-2 text-center">
+        <h1 className="text-3xl font-bold">Create Account</h1>
+        <p className="text-muted-foreground">
+          Enter your information to create an account
+        </p>
       </div>
-    </div>
-  );
-};
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="john_doe123" 
+                      {...field} 
+                      autoComplete="username"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="name@example.com" 
+                      {...field} 
+                      autoComplete="email"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      autoComplete="new-password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Button type="submit" className="w-full">
+            Create Account
+          </Button>
+        </form>
+      </Form>
+
+      <div className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <a
+          href="#"
+          className="underline hover:text-primary"
+        >
+          Sign in
+        </a>
+      </div>
+    </Card>
+  )
+}
 
 export default Register;
