@@ -1,19 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Login';
-import FileUploadWithNavigation from './FileUploadWithNavigation';
-import { Settings } from 'lucide-react';
+import FileUploader from './FileUploader';
+import SidebarSettings from './sidebar/Settings';
+import SidebarSearch from './sidebar/Search';
+import Register from './Register';
+
 
 const Rediraction: React.FC = () => {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<Login />} />
       <Route path="/Settings" element={<SidebarSettings />} />
       <Route path="/Search" element={<SidebarSearch />} />
-      <Route path="/" element={<Login />} />
-      
-      <Route path="/upload" element={<FileUploadWithNavigation />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/upload" element={<FileUploader />} />
       </Routes>
     </Router>
   );
