@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import axios from 'axios';
 import { BACKEND_API } from "@/constants";
+import { Context } from "@/App";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
 import { useNavigate } from "react-router-dom";
 
@@ -36,6 +37,8 @@ const Login: React.FC = () => {
     },
   })
 
+	const [token, setToken] = useContext(Context);
+
 	const [loginError, setLoginError] = useState(false);
 	const navigate = useNavigate();
 
@@ -48,7 +51,9 @@ const Login: React.FC = () => {
 
 			const res = await axios.post(`${BACKEND_API}/auth/login`, payload);
 			if (res.status === 201) {
-				navigate('/upload');
+				const data = res.data;
+				setToken(p => data.token);
+				navigate('/home');
 			}
 		} catch(error) {
 			setLoginError(p => true);

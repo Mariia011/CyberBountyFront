@@ -1,4 +1,4 @@
-import {Calendar, Home, Inbox, Search, Settings, History, ChevronUp} from "lucide-react"
+import {Calendar, Home, Inbox, Search, Settings, History, ChevronUp, Upload} from "lucide-react"
 
 import {
     Sidebar,
@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 const items = [
     {
         title: "Home",
-        url: "/upload",
+        url: "/home",
         icon: Home,
     },
     {
@@ -41,6 +41,11 @@ const items = [
         url: "/history",
         icon: History,
     },
+		{
+			title: "Uploads",
+			url: "/uploads",
+			icon: Upload,
+	},
     {
         title: "Settings",
         url: "/settings",
