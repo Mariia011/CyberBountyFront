@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Encryptor from '@/lib/Encyptor';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
 
@@ -23,11 +24,15 @@ const FileUploader: React.FC = () => {
   // Handles file selection for a single file.
   const handleFiles = (files: FileList) => {
     if (files.length === 0) return;
+
     const selectedFile = files[0];
+    const encryptor = new Encryptor("jiznvaram", selectedFile);
+  
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError('The file exceeds the maximum file size of 10GB.');
       return;
     }
+    console.log(encryptor.encrypt());
     setError(null);
     setFile(selectedFile);
   };
