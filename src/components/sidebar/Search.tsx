@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Interface } from "readline";
+import { BACKEND_API } from "@/constants";
+import axios from "axios";
 
 export default function SidebarSearch() {
 
@@ -12,20 +14,20 @@ export default function SidebarSearch() {
 		key: string
 	}
 
-	const	[search, setSearch] = useState<string>("");
 	const [user, setUser] = useState<IUser | null>(null);
+	const [email, setEmail] = useState<string>('');
 
 	const handleClick = () => {
-		console.log(search);
-		// axios.get("url", body);
+		// console.log(email);
+		// axios.get(`${BACKEND_API}/users/?email=${email}`);
 	}
   return (
 	<div className="bg-slate-400 justify-start w-full h-full">
 		<div className="w-full h-12 align-center justify-center mt-8">
 			<div className="flex justify-center items-center space-x-2 w-full h-12  flex">
 				<Input className="w-[40rem]" type="text" placeholder="Search..."
-					 value={search}
-				  onChange={(e:  React.ChangeEvent<HTMLInputElement >) => setSearch(e.currentTarget.value)}/>
+					 value={email}
+				  onChange={(e:  React.ChangeEvent<HTMLInputElement >) => setEmail(e.currentTarget.value)}/>
       			<Button onClick={handleClick}>Search</Button>
 			</div>
 		</div>
