@@ -2,9 +2,49 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { create } from "ipfs-http-client";
-// import Encryptor from '@/lib/Encyptor';
+import Encryptor from '@/components/Encryptor';
+import { arrayBufferToBase64, getIPFSFileBase64, base64ToUint8Array, uint8ArrayToBase64 } from '@/lib/utils';
+import Decryptor from './Decryptor';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
+
+export const generateRSAKeyPair = async (): Promise<{
+  keyPair: CryptoKeyPair;
+  publicKeyString: string;
+  privateKeyString: string;
+}> => {
+  // Generate RSA key pair
+  const keyPair = await window.crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]), // 65537
+      hash: "SHA-256",
+    },
+    true, // Extractable
+    ["encrypt", "decrypt"] // Key usages
+  );
+
+  // Export public key as base64 string
+  const publicKeyBuffer = await window.crypto.subtle.exportKey(
+    "spki",
+    keyPair.publicKey
+  );
+  const publicKeyString = arrayBufferToBase64(publicKeyBuffer);
+
+  // Export private key as base64 string
+  const privateKeyBuffer = await window.crypto.subtle.exportKey(
+    "pkcs8",
+    keyPair.privateKey
+  );
+  const privateKeyString = arrayBufferToBase64(privateKeyBuffer);
+
+  return {
+    keyPair,
+    publicKeyString,
+    privateKeyString
+  };
+};
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -30,12 +70,33 @@ const FileUploader: React.FC = () => {
 
   // Handles file selection for a single file.
   const handleFiles = async (files: FileList) => {
+
     if (files.length === 0) return;
 
     const selectedFile = files[0];
-    // const encryptor = new Encryptor("jiznvaram", selectedFile);
-    const addedFile = await ipfs.add(selectedFile);
-    console.log("CID:", addedFile.path);
+    console.log('selectedFile => ', selectedFile);
+
+    const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
+
+    // Encrypt file
+    const eres = await Encryptor(selectedFile, publicKeyString);
+    console.log("Encrypted file (Base64):", eres.encryptedFile);
+
+    // Convert Base64 to Uint8Array
+    const encryptedUint8Array = base64ToUint8Array(eres.encryptedFile);
+
+    // Upload to IPFS
+    const addedFile = await ipfs.add(encryptedUint8Array);
+    console.log("IPFS CID:", addedFile.path);
+
+    // Retrieve file from IPFS
+    const getFile = await getIPFSFileBase64(ipfs, addedFile.path);
+    console.log("Retrieved Encrypted File (Base64):", getFile);
+
+    // Decrypt file
+    const dres = await Decryptor(getFile, eres.encryptedAesKey, eres.iv, privateKeyString);
+    console.log("Decrypted file:", await dres.text());
+    // console.log(await dres.text());
     // const fileData = await selectedFile.text();
     // console.log(fileData);
     if (selectedFile.size > MAX_FILE_SIZE) {
