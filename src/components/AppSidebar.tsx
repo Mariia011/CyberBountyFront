@@ -35,7 +35,7 @@ const items = [
         title: "Search",
         url: "#",
         icon: Search,
-    },
+    },  
     {
         title: "History",
         url: "/history",
