@@ -23,7 +23,7 @@ const items = [
     },
     {
         title: "Inbox",
-        url: "#",
+        url: "/inbox",
         icon: Inbox,
     },
     {
@@ -33,7 +33,7 @@ const items = [
     },
     {
         title: "Search",
-        url: "#",
+        url: "/search",
         icon: Search,
     },
     {

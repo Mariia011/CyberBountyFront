@@ -12,13 +12,12 @@ const Redirection: React.FC = () => {
   return (
     <Router>
       <Routes>
-      <Route path="/Settings" element={<SidebarSettings />} />
-      <Route path="/Search" element={<SidebarSearch />} />
+      <Route path="/settings" element={<SidebarSettings />} />
+      <Route path="/search" element={<SidebarSearch />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/upload" element={<FileUploader />} />
       <Route path="/history" element={<SidebarHistory />} />
-      
       </Routes>
     </Router>
   );

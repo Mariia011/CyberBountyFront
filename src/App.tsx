@@ -1,6 +1,7 @@
 import { AppSidebar } from "./components/AppSidebar"
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
 import Redirection from "./components/Redirection"
+
 function App() {
 
   return (
