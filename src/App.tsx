@@ -1,18 +1,18 @@
-import { AppSidebar } from "./components/AppSidebar"
-import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
+
 import Redirection from "./components/Redirection"
+import Sidebar from "./components/Sidebar"
 
 function App() {
 
   return (
     <>
-       <SidebarProvider>
-          <AppSidebar />
-          <SidebarTrigger />
-              <div className="content-center justify-center mx-auto">
-                <Redirection />
-              </div>
-      </SidebarProvider>
+	<div className="wrapper w-[100dvw] h-[100dvh] flex bg-red-600 overflow-x-hidden">
+		{/* <Sidebar/> */}
+		<div>
+			<Sidebar/>
+		</div>
+		<Redirection />
+	</div>
     </>
   )
 }
