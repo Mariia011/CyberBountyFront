@@ -1,30 +1,21 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useState, ReactNode } from "react";
 
 // Определяем тип контекста
-interface SessionContextType {
-  userId: number | null;
-  setUserId: (id: number | null) => void;
-}
+// interface SessionContextType {
+//   pKey: number | null;
+//   setpKey: (id: number | null) => void;
+// }
 
 // Создаем контекст
-const SessionContext = createContext<SessionContextType | undefined>(undefined);
+export const SessionContext = createContext<any>(undefined);
 
 // Провайдер контекста
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [userId, setUserId] = useState<number | null>(null);
+  const [pKey, setpKey] = useState<number | null>(null);
 
   return (
-    <SessionContext.Provider value={{ userId, setUserId }}>
+    <SessionContext.Provider value={[ pKey, setpKey ]}>
       {children}
     </SessionContext.Provider>
   );
-};
-
-// Хук для использования контекста
-export const useSession = () => {
-  const context = useContext(SessionContext);
-  if (!context) {
-    throw new Error("useSession must be used within a SessionProvider");
-  }
-  return context;
 };

@@ -35,9 +35,9 @@ const FileUploader: React.FC = () => {
     if (files.length === 0) return;
 
     const selectedFile = files[0];
-    const { publicKeyString } = await axios.get("");
+    // const { publicKeyString } = await axios.get("");
     // Encrypt file
-    const eres = await Encryptor(selectedFile, publicKeyString);
+    // const eres = await Encryptor(selectedFile, publicKeyString);
 
     // Convert Base64 to Uint8Array
     const encryptedUint8Array = base64ToUint8Array(eres.encryptedFile);

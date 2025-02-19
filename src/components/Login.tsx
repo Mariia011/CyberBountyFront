@@ -16,9 +16,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
 import { useNavigate } from "react-router-dom";
+import { TokenContext } from "@/hooks/use-token";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -38,6 +39,7 @@ const Login: React.FC = () => {
 
 	const [loginError, setLoginError] = useState(false);
 	const navigate = useNavigate();
+  const [_, setToken] = useContext(TokenContext);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -47,6 +49,7 @@ const Login: React.FC = () => {
 			};
 
 			const res = await axios.post(`${BACKEND_API}/auth/login`, payload);
+      setToken(res.data.token);
 			if (res.status === 201) {
 				navigate('/upload');
 			}

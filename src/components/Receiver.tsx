@@ -121,4 +121,4 @@ const Receiver: React.FC = () => {
   );
 };
 
-export default Receiver;
+export default Receiver;  

@@ -16,11 +16,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
 import { generateRSAKeyPair } from "@/lib/utils";
-import { addData } from "@/utility/indexDB";
-import { useSession } from "@/hooks/use-key";
+import { addString } from "@/utility/indexDB";
+import { SessionContext } from "@/hooks/use-key";
 
 const formSchema = z.object({
   username: z.string()
@@ -55,12 +55,12 @@ const Register: React.FC = () => {
 	const navigate = useNavigate();
 	const [registerError, setRegisterError] = useState(false);
 
+  const [_, pSetKey]: any = useContext(SessionContext);
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const [_, pSetKey]: any = useSession();
 
 		try {
       const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
-      const id = addData(privateKeyString);
+      const id = addString(privateKeyString);
       pSetKey(id);
 
 			const payload = {
@@ -71,7 +71,7 @@ const Register: React.FC = () => {
 			};
 
 			const res = await axios.post(`${BACKEND_API}/auth/register`, payload);
-
+      
 			if (res.status === 201) {
 				navigate('/login');
 			}
