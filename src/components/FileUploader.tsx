@@ -104,7 +104,7 @@ const FileUploader: React.FC = () => {
 
   return (
     <Card
-      className={`p-4 border-2 rounded-md transition-colors duration-200 ${dragActive ? 'border-blue-500' : 'border-gray-300'}`}
+	className="flex justify-center items-center p-4 transition-colors duration-200 ${dragActive ? 'border-blue-500' : 'border-gray-300'}"
       onDragEnter={handleDrag}
       onDragOver={handleDrag}
       onDragLeave={handleDrag}

@@ -4,9 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 
-//
 // 1. Define a generic interface for a setting field
-//
+
 interface SettingField {
   key: string;
   label: string;
@@ -16,9 +15,8 @@ interface SettingField {
   customRenderer?: () => React.ReactNode;
 }
 
-//
 // 2. Render an individual setting item
-//
+
 const SettingItem: React.FC<{ field: SettingField }> = ({ field }) => {
   if (field.type === 'custom' && field.customRenderer) {
     return (
@@ -67,9 +65,7 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({ groupName, fields, layout
   );
 };
 
-//
 // 4. Render the complete settings form
-//
 
 interface SettingsGroupConfig {
   groupName: string;
@@ -103,9 +99,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ groups }) => {
   );
 };
 
-//
 // 5. Theme switcher component
-//
+
 interface ThemeSwitcherProps {
   theme: string;
   setTheme: (theme: string) => void;
@@ -124,9 +119,8 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
   );
 };
 
-//
-// 6. Main Settings component that manages state and configuration
-//
+//  Main Settings component that manages state and configuration
+
 const SidebarSettings: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

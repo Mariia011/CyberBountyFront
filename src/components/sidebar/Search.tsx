@@ -1,80 +1,58 @@
-import React, { useState } from "react";
-import axios from "axios";
-// Import shadcn/ui components (adjust paths as needed)
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { Interface } from "readline";
 import { BACKEND_API } from "@/constants";
+import axios from "axios";
 
-interface User {
-  username: string;
-  email: string;
-}
+export default function SidebarSearch() {
 
-const UserSearch: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState("username"); // either 'username' or 'email'
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+	interface IUser {
+		email: string,
+		username: string,
+		password: string,
+		key: string
+	}
 
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setUsers([]);
+	const [user, setUser] = useState<IUser | null>(null);
+	const [email, setEmail] = useState<string>('');
 
-    setSearchType(searchTerm.includes("@") ? "email" : "username");
-
-    try {
-      // Adjust the URL as per your API design
-      console.log(searchType, searchTerm);
-      const response = await axios.get<User[]>(`${BACKEND_API}/users/?${searchType}=${searchTerm}`);
-      // const response = await axios.get<User[]>(`http://localhost:1488/users/?username=asdf`);
-      console.log("response.data:", response.data);
-      setUsers(response.data);
-    } catch (err: any) {
-      setError("Error searching users. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+	const handleClick = () => {
+		// console.log(email);
+		// axios.get(`${BACKEND_API}/users/?email=${email}`);
+	}
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Search Registered Users</h2>
-      <form onSubmit={handleSearch} className="flex flex-col gap-2 mb-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Enter search term"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1"
-          />
-          <Button type="submit">Search</Button>
-        </div>
-      </form>
-      
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {users.length > 0 ? (
-        <div className="grid gap-4">
-          {users.map((user) => (
-            <Card key={Date.now()} className="p-4">
-              <CardHeader>
-                <h3 className="text-lg font-semibold">{user.username}</h3>
-              </CardHeader>
-              <CardContent>
-                <p>{user.email}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        !loading && <p>No users found.</p>
-      )}
-    </div>
+	<div className="bg-slate-400 justify-start w-full h-full">
+		<div className="w-full h-12 align-center justify-center mt-8">
+			<div className="flex justify-center items-center space-x-2 w-full h-12  flex">
+				<Input className="w-[40rem]" type="text" placeholder="Search..."
+					 value={email}
+				  onChange={(e:  React.ChangeEvent<HTMLInputElement >) => setEmail(e.currentTarget.value)}/>
+      			<Button onClick={handleClick}>Search</Button>
+			</div>
+		</div>
+		<div className="flex ps-24 pe-24 h-[50dvh] justify-center content-center mt-10">
+			{
+				(user ?
+				<>
+					<div className="flex flex-col">
+						<span><b>Username:</b> {user?.username}</span>
+						<span><b>Email:</b> {user?.email}</span>
+						<span><b>Key:</b> {user?.key}</span>
+					</div>
+				</>: <h1><b>No user searched</b></h1>
+				)
+				// (true ?
+				// 	<>
+				// 		<div className="flex flex-col">
+				// 			<span><b>Username:</b> {user?.username || 'Serob'}</span>
+				// 			<span><b>Email:</b> {user?.email || "qwerty123"}</span>
+				// 			<span><b>Key:</b> {user?.key || "keyser"}</span>
+				// 		</div>
+				// 	</>: <h1><b>No user searched</b></h1>
+				// 	)
+			}
+		</div>
+	</div>
   );
-};
-
-export default UserSearch;
+}
