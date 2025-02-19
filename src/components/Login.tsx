@@ -51,7 +51,7 @@ const Login: React.FC = () => {
 				navigate('/upload');
 			}
 		} catch(error) {
-			setLoginError(p => true);
+			setLoginError(true);
 			console.log(error);
 		}
   }

@@ -18,6 +18,9 @@ import { Card } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
+import { generateRSAKeyPair } from "@/lib/utils";
+import { addData } from "@/utility/indexDB";
+import { useSession } from "@/hooks/use-key";
 
 const formSchema = z.object({
   username: z.string()
@@ -53,12 +56,18 @@ const Register: React.FC = () => {
 	const [registerError, setRegisterError] = useState(false);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const [_, pSetKey]: any = useSession();
+
 		try {
+      const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
+      const id = addData(privateKeyString);
+      pSetKey(id);
+
 			const payload = {
 				username: values.username,
 				email: values.email,
 				password:values.password,
-				key: values.key
+				key: publicKeyString
 			};
 
 			const res = await axios.post(`${BACKEND_API}/auth/register`, payload);
@@ -156,24 +165,6 @@ const Register: React.FC = () => {
                       placeholder="••••••••"
                       {...field}
                       autoComplete="new-password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-				<FormField
-              control={form.control}
-              name="key"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Public Key</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="ssh 4567897654-AFHGVSJFB"
-                      {...field}
-											autoComplete="public key"
                     />
                   </FormControl>
                   <FormMessage />

@@ -1,49 +1,11 @@
+import axios from "axios";
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { create } from "ipfs-http-client";
 import Encryptor from '@/components/Encryptor';
-import { arrayBufferToBase64, base64ToUint8Array } from '@/lib/utils';
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
-
-export const generateRSAKeyPair = async (): Promise<{
-  keyPair: CryptoKeyPair;
-  publicKeyString: string;
-  privateKeyString: string;
-}> => {
-  // Generate RSA key pair
-  const keyPair = await window.crypto.subtle.generateKey(
-    {
-      name: "RSA-OAEP",
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]), // 65537
-      hash: "SHA-256",
-    },
-    true, // Extractable
-    ["encrypt", "decrypt"] // Key usages
-  );
-
-  // Export public key as base64 string
-  const publicKeyBuffer = await window.crypto.subtle.exportKey(
-    "spki",
-    keyPair.publicKey
-  );
-  const publicKeyString = arrayBufferToBase64(publicKeyBuffer);
-
-  // Export private key as base64 string
-  const privateKeyBuffer = await window.crypto.subtle.exportKey(
-    "pkcs8",
-    keyPair.privateKey
-  );
-  const privateKeyString = arrayBufferToBase64(privateKeyBuffer);
-
-  return {
-    keyPair,
-    publicKeyString,
-    privateKeyString
-  };
-};
+import { base64ToUint8Array } from '@/lib/utils';
+import { MAX_FILE_SIZE } from '@/constants';
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -73,9 +35,7 @@ const FileUploader: React.FC = () => {
     if (files.length === 0) return;
 
     const selectedFile = files[0];
-
-    const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
-
+    const { publicKeyString } = await axios.get("");
     // Encrypt file
     const eres = await Encryptor(selectedFile, publicKeyString);
 
@@ -85,10 +45,10 @@ const FileUploader: React.FC = () => {
     // Upload to IPFS
     const addedFile = await ipfs.add(encryptedUint8Array);
 
-    console.log("private key:", privateKeyString);
-    console.log("cid:", addedFile.path);
-    console.log("encrypted key:", eres.encryptedAesKey);
-    console.log("iv:", eres.iv);
+    // console.log("private key:", privateKeyString);
+    // console.log("cid:", addedFile.path);
+    // console.log("encrypted key:", eres.encryptedAesKey);
+    // console.log("iv:", eres.iv);
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError('The file exceeds the maximum file size of 10GB.');
       return;
