@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { create } from "ipfs-http-client";
 import Encryptor from '@/components/Encryptor';
-import { arrayBufferToBase64, getIPFSFileBase64, base64ToUint8Array, uint8ArrayToBase64 } from '@/lib/utils';
-import Decryptor from './Decryptor';
+import { arrayBufferToBase64, base64ToUint8Array } from '@/lib/utils';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
 
@@ -74,36 +73,26 @@ const FileUploader: React.FC = () => {
     if (files.length === 0) return;
 
     const selectedFile = files[0];
-    console.log('selectedFile => ', selectedFile);
 
     const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
 
     // Encrypt file
     const eres = await Encryptor(selectedFile, publicKeyString);
-    console.log("Encrypted file (Base64):", eres.encryptedFile);
 
     // Convert Base64 to Uint8Array
     const encryptedUint8Array = base64ToUint8Array(eres.encryptedFile);
 
     // Upload to IPFS
     const addedFile = await ipfs.add(encryptedUint8Array);
-    console.log("IPFS CID:", addedFile.path);
 
-    // Retrieve file from IPFS
-    const getFile = await getIPFSFileBase64(ipfs, addedFile.path);
-    console.log("Retrieved Encrypted File (Base64):", getFile);
-
-    // Decrypt file
-    const dres = await Decryptor(getFile, eres.encryptedAesKey, eres.iv, privateKeyString);
-    console.log("Decrypted file:", await dres.text());
-    // console.log(await dres.text());
-    // const fileData = await selectedFile.text();
-    // console.log(fileData);
+    console.log("private key:", privateKeyString);
+    console.log("cid:", addedFile.path);
+    console.log("encrypted key:", eres.encryptedAesKey);
+    console.log("iv:", eres.iv);
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError('The file exceeds the maximum file size of 10GB.');
       return;
     }
-    // console.log(encryptor.encrypt());
     setError(null);
     setFile(selectedFile);
   };

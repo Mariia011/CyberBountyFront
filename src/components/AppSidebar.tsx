@@ -28,7 +28,7 @@ const items = [
     },
     {
         title: "Files",
-        url: "#",
+        url: "/receiver",
         icon: Calendar,
     },
     {
