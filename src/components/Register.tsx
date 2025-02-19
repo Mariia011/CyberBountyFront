@@ -68,7 +68,8 @@ const Register: React.FC = () => {
 		} catch (err) {
 			if (err instanceof AxiosError && err.status === 400) {
 				console.log('User already exists');
-				setRegisterError(p => true);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+				setRegisterError(_p => true);
 			}
 			console.log({ values, err });
 		}
