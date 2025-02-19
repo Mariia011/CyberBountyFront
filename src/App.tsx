@@ -1,7 +1,6 @@
 import { AppSidebar } from "./components/AppSidebar"
 import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
-import Rediraction from "./components/Redirection"
-
+import Redirection from "./components/Redirection"
 function App() {
 
   return (
@@ -10,9 +9,9 @@ function App() {
           <AppSidebar />
           <SidebarTrigger />
               <div className="content-center justify-center mx-auto">
-                <Rediraction />
+                <Redirection />
               </div>
-      </SidebarProvider>     
+      </SidebarProvider>
     </>
   )
 }

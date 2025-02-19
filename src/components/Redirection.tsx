@@ -8,7 +8,7 @@ import Register from './Register';
 import SidebarHistory from './SidebarHistory';
 
 
-const Rediraction: React.FC = () => {
+const Redirection: React.FC = () => {
   return (
     <Router>
       <Routes>
@@ -24,4 +24,4 @@ const Rediraction: React.FC = () => {
   );
 };
 
-export default Rediraction;
+export default Redirection;
