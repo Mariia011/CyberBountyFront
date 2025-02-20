@@ -51,7 +51,8 @@ const Login: React.FC = () => {
 				navigate('/upload');
 			}
 		} catch(error) {
-			setLoginError(p => true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+			setLoginError(_p => true);
 			console.log(error);
 		}
   }

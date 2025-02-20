@@ -1,50 +1,35 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Aram47/cyber-bounty-backend/main/icons/logo.png" width="250" alt="Your Logo" />
+</p>
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+CyberBounty-frontend
 
-## Expanding the ESLint configuration
+# Requirements
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React
+- Vite
 
-- Configure the top-level `parserOptions` property like this:
+## Run the project
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm i
+npm run build
+npm run preview
 ```
+## Environment
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+The .env.example file is the same as my local .env, so feel free to use it
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Core Maintainers
+- [Aram Minasyan](https://www.linkedin.com/in/aram47/)
+- [Tigran Petrosyan](https://www.linkedin.com/in/tigran-petrosyan-091a5630a/)
+- [Mariia Khachaturova](https://www.linkedin.com/in/mariia-khachaturova-27165b271/a/)
+- [Tigran Yavroyan](https://www.linkedin.com/in/tigran-yavroyan-bb78a5280/)
+- [Artyom Amirkhanyan](https://www.linkedin.com/in/artyom-amirkhanyan-b951b52a7/)
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## License
+
+This project is [GPL3 licensed](https://github.com/Aram47/cyber-bounty-backend/blob/main/LICENSE).
