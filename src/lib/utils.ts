@@ -58,34 +58,40 @@ export const uint8ArrayToBase64 = (uint8Array: Uint8Array): string => {
   return btoa(binary);
 };
 
+export const generateRSAKeyPair = async (): Promise<{
+  keyPair: CryptoKeyPair;
+  publicKeyString: string;
+  privateKeyString: string;
+}> => {
+  // Generate RSA key pair
+  const keyPair = await window.crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]), // 65537
+      hash: "SHA-256",
+    },
+    true, // Extractable
+    ["encrypt", "decrypt"] // Key usages
+  );
 
+  // Export public key as base64 string
+  const publicKeyBuffer = await window.crypto.subtle.exportKey(
+    "spki",
+    keyPair.publicKey
+  );
+  const publicKeyString = arrayBufferToBase64(publicKeyBuffer);
 
-// export async function getIPFSFileBase64(ipfs: any, cid: string): Promise<string> {
-//   const result = await ipfs.get(cid);
-//   // Check if result is an array; if not, wrap it in one.
-//   const files = Array.isArray(result) ? result : [result];
+  // Export private key as base64 string
+  const privateKeyBuffer = await window.crypto.subtle.exportKey(
+    "pkcs8",
+    keyPair.privateKey
+  );
+  const privateKeyString = arrayBufferToBase64(privateKeyBuffer);
 
-//   // We'll just use the first file that has content.
-//   let fileObj = files.find((f) => f.content);
-//   if (!fileObj) {
-//     throw new Error(`No file content found for CID: ${cid}`);
-//   }
-
-//   const chunks: Uint8Array[] = [];
-//   // fileObj.content is expected to be an async iterable
-//   for await (const chunk of fileObj.content) {
-//     chunks.push(chunk);
-//   }
-
-//   // Combine chunks into a single Uint8Array
-//   const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-//   const combined = new Uint8Array(totalLength);
-//   let offset = 0;
-//   for (const chunk of chunks) {
-//     combined.set(chunk, offset);
-//     offset += chunk.length;
-//   }
-
-//   // Return the Base64-encoded string of the combined data.
-//   return arrayBufferToBase64(combined.buffer);
-// }
+  return {
+    keyPair,
+    publicKeyString,
+    privateKeyString
+  };
+};

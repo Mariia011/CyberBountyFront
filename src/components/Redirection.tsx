@@ -6,6 +6,7 @@ import SidebarSettings from './sidebar/Settings';
 import SidebarSearch from './sidebar/Search';
 import Register from './Register';
 import SidebarHistory from './SidebarHistory';
+import Receiver from './Receiver';
 
 
 const Redirection: React.FC = () => {
@@ -18,6 +19,7 @@ const Redirection: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/upload" element={<FileUploader />} />
       <Route path="/history" element={<SidebarHistory />} />
+      <Route path="/receiver" element={<Receiver />} />
       
       </Routes>
     </Router>
