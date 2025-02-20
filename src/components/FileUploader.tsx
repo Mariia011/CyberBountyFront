@@ -245,16 +245,18 @@ const FileUploader: React.FC = () => {
 
     try {
       // Fetch recipient's public key
-      console.log(localStorage.getItem("token"));
+      console.log('localstroage token: ', localStorage.getItem("token"));
       const { data } = await axios.get(`${BACKEND_API}/users/?email=${recipientEmail}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
       });
-      if (!data?.key) throw new Error('Recipient not found');
+      const user = data;
+      if (!user?.key) throw new Error('Recipient not found');
+      console.log('recipient: ', user);
 
       // Encrypt file
-      const eres = await Encryptor(file, data.key);
+      const eres = await Encryptor(file, user.key);
       const encryptedUint8Array = base64ToUint8Array(eres.encryptedFile);
 
       // Upload to IPFS
@@ -263,7 +265,7 @@ const FileUploader: React.FC = () => {
       const payload = {
         encRandKey: eres.encryptedAesKey,
         hashData: `${addedFile.path} ${eres.iv}`,
-        recipientsId: data.user.id,
+        recipientsId: user.id,
       }
       const dambul = await axios.post(`${BACKEND_API}/file`, payload, {
         headers: {
