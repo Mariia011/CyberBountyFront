@@ -245,10 +245,10 @@ const FileUploader: React.FC = () => {
 
     try {
       // Fetch recipient's public key
-      console.log('localstroage token: ', localStorage.getItem("token"));
+      console.log('localstroage token: ', sessionStorage.getItem("token"));
       const { data } = await axios.get(`${BACKEND_API}/users/?email=${recipientEmail}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`
         }
       });
       const user = data;
