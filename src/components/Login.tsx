@@ -19,6 +19,8 @@ import { Card } from "@/components/ui/card"
 import { useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
 import { useNavigate } from "react-router-dom";
+import { generateRSAKeyPair } from "@/lib/utils";
+import { storeEncryptedPrivateKey } from "@/lib/localStorageKeyManager";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -46,12 +48,25 @@ const Login: React.FC = () => {
 				password: values.password
 			};
 
+      const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
+      storeEncryptedPrivateKey(privateKeyString);
 			const res = await axios.post(`${BACKEND_API}/auth/login`, payload);
+
+      sessionStorage.setItem("token", res.data.token);
+      console.log(res);
+      const check = await axios.patch(`${BACKEND_API}/users/${res.data.user.id}`, {...res.data.user, key: publicKeyString}, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`
+        }
+      });
+      console.log(check);
+      localStorage.setItem("token", res.data.token);
+      
 			if (res.status === 201) {
 				navigate('/upload');
 			}
 		} catch(error) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
 			setLoginError(_p => true);
 			console.log(error);
 		}
