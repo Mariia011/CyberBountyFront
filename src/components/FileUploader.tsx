@@ -1,49 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { create } from "ipfs-http-client";
 import Encryptor from '@/components/Encryptor';
-import { arrayBufferToBase64, base64ToUint8Array } from '@/lib/utils';
+import { base64ToUint8Array, generateRSAKeyPair } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';import { DecryptInfoContext } from '@/hooks/decrypt-info';
+import { IPFS_API, IPFS_PORT } from '@/constants';
+;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
 
-export const generateRSAKeyPair = async (): Promise<{
-  keyPair: CryptoKeyPair;
-  publicKeyString: string;
-  privateKeyString: string;
-}> => {
-  // Generate RSA key pair
-  const keyPair = await window.crypto.subtle.generateKey(
-    {
-      name: "RSA-OAEP",
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]), // 65537
-      hash: "SHA-256",
-    },
-    true, // Extractable
-    ["encrypt", "decrypt"] // Key usages
-  );
 
-  // Export public key as base64 string
-  const publicKeyBuffer = await window.crypto.subtle.exportKey(
-    "spki",
-    keyPair.publicKey
-  );
-  const publicKeyString = arrayBufferToBase64(publicKeyBuffer);
-
-  // Export private key as base64 string
-  const privateKeyBuffer = await window.crypto.subtle.exportKey(
-    "pkcs8",
-    keyPair.privateKey
-  );
-  const privateKeyString = arrayBufferToBase64(privateKeyBuffer);
-
-  return {
-    keyPair,
-    publicKeyString,
-    privateKeyString
-  };
-};
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -60,10 +27,12 @@ const FileUploader: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  const [decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
+  const navigate = useNavigate();
 
   const ipfs = create({
-    host: "localhost",
-    port: 5001,
+    host: IPFS_API,
+    port: IPFS_PORT,
     protocol: "http"
   });
 
@@ -84,11 +53,24 @@ const FileUploader: React.FC = () => {
 
     // Upload to IPFS
     const addedFile = await ipfs.add(encryptedUint8Array);
+    decryptInfoSet({iv: eres.iv, encKey: eres.encryptedAesKey, cid: addedFile.path, privateKey: privateKeyString});
 
-    console.log("private key:", privateKeyString);
-    console.log("cid:", addedFile.path);
-    console.log("encrypted key:", eres.encryptedAesKey);
-    console.log("iv:", eres.iv);
+    // console.log("IPFS CID:", addedFile.path);
+    // console.log("EncKey:", eres.encryptedAesKey);
+    // console.log("iv:", eres.iv);;
+    // console.log("privateKey:", privateKeyString);
+    
+
+    // Retrieve file from IPFS
+    // const getFile = await getIPFSFileBase64(ipfs, addedFile.path);
+    // console.log("Retrieved Encrypted File (Base64):", getFile);
+
+    // Decrypt file
+    // const dres = await Decryptor(getFile, eres.encryptedAesKey, eres.iv, privateKeyString);
+    // console.log("Decrypted file:", await dres.text());
+    // console.log(await dres.text());
+    // const fileData = await selectedFile.text();
+    // console.log(fileData);
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError('The file exceeds the maximum file size of 10GB.');
       return;
@@ -134,6 +116,7 @@ const FileUploader: React.FC = () => {
   // Simulate uploading the file.
   const handleUpload = async () => {
     if (!file) return;
+    navigate("/receiver");
     setUploading(true);
     setUploadMessage(null);
     // Simulate a network delay (e.g., 2 seconds)

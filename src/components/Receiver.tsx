@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,19 +6,30 @@ import { Label } from '@/components/ui/label';
 import { create } from 'ipfs-http-client';
 import Decryptor from './Decryptor';
 import { getIPFSFileBase64 } from '@/lib/utils';
+import { DecryptInfoContext } from '@/hooks/decrypt-info';
+import { IPFS_API, IPFS_PORT } from '@/constants';
 
 const Receiver: React.FC = () => {
-  const [cid, setCid] = useState('');
-  const [encryptedAesKey, setEncryptedAesKey] = useState('');
-  const [iv, setIv] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
-  const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+	const [cid, setCid] = useState('');
+	const [encryptedAesKey, setEncryptedAesKey] = useState('');
+	const [iv, setIv] = useState('');
+	const [privateKey, setPrivateKey] = useState('');
+	const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
+
+	useEffect(() => {
+		setIv(decryptInfo.iv);
+		setCid(decryptInfo.cid);
+		setEncryptedAesKey(decryptInfo.encKey);
+		setPrivateKey(decryptInfo.privateKey);
+	}, []);
 
   const ipfs = create({
-    host: "localhost",
-    port: 5001,
+    host: IPFS_API,
+    port: IPFS_PORT,
     protocol: "http"
   });
 
@@ -26,7 +37,6 @@ const Receiver: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
       // Get encrypted file from IPFS
       const encryptedFile = await getIPFSFileBase64(ipfs, cid);
       
