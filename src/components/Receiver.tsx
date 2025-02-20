@@ -18,7 +18,8 @@ const Receiver: React.FC = () => {
 	const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [decryptInfo, _setDecryptInfo] = useContext(DecryptInfoContext);
 
 	useEffect(() => {
 		setIv(decryptInfo.iv);

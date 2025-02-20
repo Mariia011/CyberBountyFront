@@ -27,7 +27,8 @@ const FileUploader: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
-  const [decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
   const navigate = useNavigate();
 
   const ipfs = create({
