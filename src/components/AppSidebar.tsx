@@ -1,4 +1,4 @@
-import {Calendar, Home, Inbox, Search, Settings, History, ChevronUp} from "lucide-react"
+import {Calendar, Home, Inbox, Search, File, Settings, History, ChevronUp} from "lucide-react"
 
 import {
     Sidebar,
@@ -17,9 +17,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 // Menu items.
 const items = [
     {
-        title: "Home",
+        title: "Upload File",
         url: "/upload",
-        icon: Home,
+        icon: File,
     },
     {
         title: "Inbox",
