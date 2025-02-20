@@ -2,7 +2,6 @@ import React, { createContext, useState, ReactNode } from "react";
 
 export const DecryptInfoContext = createContext<any>(undefined);
 
-// Провайдер контекста
 export const DecryptInfoProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [DecryptInfo, setDecryptInfo] = useState<{
 	cid: string,
