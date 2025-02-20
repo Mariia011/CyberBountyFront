@@ -18,7 +18,7 @@ import { Card } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
-import { storeEncryptedPrivateKey } from "@/lib/localStorageKeyManager";
+import { storeEncryptedPrivateKey } from "@/lib/sessionStorageKeyManager";
 import { generateRSAKeyPair } from "@/lib/utils";
 
 // const formSchema = z.object({

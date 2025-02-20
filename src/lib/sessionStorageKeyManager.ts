@@ -13,7 +13,7 @@ const STORAGE_KEY = 'encryptedPrivateKey';
 export async function storeEncryptedPrivateKey(privateKey: string, salt: string = SALT): Promise<void> {
   try {
     const encrypted = await encryptPrivateKey(privateKey, salt);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(encrypted));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(encrypted));
   } catch (err) {
     console.error('Error encrypting and storing private key:', err);
     throw err;
@@ -27,7 +27,7 @@ export async function storeEncryptedPrivateKey(privateKey: string, salt: string 
  */
 export async function retrieveDecryptedPrivateKey(salt: string = SALT): Promise<string> {
   try {
-    const encryptedData = localStorage.getItem(STORAGE_KEY);
+    const encryptedData = sessionStorage.getItem(STORAGE_KEY);
     if (!encryptedData) {
       throw new Error('No encrypted key found in storage');
     }
@@ -43,5 +43,5 @@ export async function retrieveDecryptedPrivateKey(salt: string = SALT): Promise<
  * Clears the stored encrypted private key from localStorage.
  */
 export function clearEncryptedPrivateKey(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(STORAGE_KEY);
 }

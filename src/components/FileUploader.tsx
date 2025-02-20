@@ -171,7 +171,7 @@ import { base64ToUint8Array, isEmail } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { DecryptInfoContext } from '@/hooks/decrypt-info';
 import { BACKEND_API, IPFS_API, IPFS_PORT } from '@/constants';
-import { retrieveDecryptedPrivateKey } from '@/lib/localStorageKeyManager';
+import { retrieveDecryptedPrivateKey } from '@/lib/sessionStorageKeyManager';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
 

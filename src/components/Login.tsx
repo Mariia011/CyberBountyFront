@@ -20,7 +20,7 @@ import { useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
 import { useNavigate } from "react-router-dom";
 import { generateRSAKeyPair } from "@/lib/utils";
-import { storeEncryptedPrivateKey } from "@/lib/localStorageKeyManager";
+import { storeEncryptedPrivateKey } from "@/lib/sessionStorageKeyManager";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -61,7 +61,6 @@ const Login: React.FC = () => {
         }
       });
       console.log(check);
-      localStorage.setItem("token", res.data.token);
       
 			if (res.status === 201) {
 				navigate('/upload');
