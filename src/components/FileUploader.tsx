@@ -1,8 +1,11 @@
+import axios from "axios";
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
+import { create } from "ipfs-http-client";
+import Encryptor from '@/components/Encryptor';
+import { base64ToUint8Array } from '@/lib/utils';
+import { MAX_FILE_SIZE } from '@/constants';
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -20,10 +23,32 @@ const FileUploader: React.FC = ({ destUserId }:  { destUserId: number }) => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
+  const ipfs = create({
+    host: "localhost",
+    port: 5001,
+    protocol: "http"
+  });
+
   // Handles file selection for a single file.
-  const handleFiles = (files: FileList) => {
+  const handleFiles = async (files: FileList) => {
+
     if (files.length === 0) return;
+
     const selectedFile = files[0];
+    // const { publicKeyString } = await axios.get("");
+    // Encrypt file
+    // const eres = await Encryptor(selectedFile, publicKeyString);
+
+    // Convert Base64 to Uint8Array
+    const encryptedUint8Array = base64ToUint8Array(eres.encryptedFile);
+
+    // Upload to IPFS
+    const addedFile = await ipfs.add(encryptedUint8Array);
+
+    // console.log("private key:", privateKeyString);
+    // console.log("cid:", addedFile.path);
+    // console.log("encrypted key:", eres.encryptedAesKey);
+    // console.log("iv:", eres.iv);
     if (selectedFile.size > MAX_FILE_SIZE) {
       setError('The file exceeds the maximum file size of 10GB.');
       return;
@@ -79,7 +104,7 @@ const FileUploader: React.FC = ({ destUserId }:  { destUserId: number }) => {
 
   return (
     <Card
-      className={`p-4 border-2 rounded-md transition-colors duration-200 ${dragActive ? 'border-blue-500' : 'border-gray-300'}`}
+	className="flex justify-center items-center p-4 transition-colors duration-200 ${dragActive ? 'border-blue-500' : 'border-gray-300'}"
       onDragEnter={handleDrag}
       onDragOver={handleDrag}
       onDragLeave={handleDrag}

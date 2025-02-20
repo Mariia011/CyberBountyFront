@@ -1,25 +1,27 @@
-import { AppSidebar } from "./components/AppSidebar"
-import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar"
-import Redirection from "./components/Redirection"
-import { useState } from "react";
-import React from "react";
 
-export const Context = React.createContext();
+import Redirection from "./components/Redirection"
+import { SessionProvider } from "./hooks/use-key"
+import { SidebarProvider } from "./components/ui/sidebar"
+import { AppSidebar } from "./components/AppSidebar"
+import { SidebarTrigger } from "./components/ui/sidebar"
+import { TokenProvider } from "./hooks/use-token"
 
 function App() {
 
-	const [token, setToken] = useState("");
-
   return (
-    <Context.Provider value={[token, setToken]}>
-				<SidebarProvider>
-						<AppSidebar />
-						<SidebarTrigger />
-								<div className="content-center justify-center mx-auto">
-									<Redirection />
-								</div>
-				</SidebarProvider>
-    </Context.Provider>
+    <>
+      <SessionProvider>
+        <TokenProvider>
+          <SidebarProvider>
+              <AppSidebar />
+              <SidebarTrigger />
+                  <div className="content-center justify-center mx-auto">
+                    <Redirection />
+                  </div>
+          </SidebarProvider>
+        </TokenProvider>  
+      </SessionProvider>
+    </>
   )
 }
 

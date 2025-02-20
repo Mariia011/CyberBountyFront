@@ -23,17 +23,17 @@ const items = [
     },
     {
         title: "Inbox",
-        url: "#",
+        url: "/inbox",
         icon: Inbox,
     },
     {
         title: "Files",
-        url: "#",
+        url: "/receiver",
         icon: Calendar,
     },
     {
         title: "Search",
-        url: "#",
+        url: "/search",
         icon: Search,
     },
     {

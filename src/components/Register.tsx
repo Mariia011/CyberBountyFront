@@ -16,8 +16,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AlertDestructive } from "./AlertDestructive";
+import { generateRSAKeyPair } from "@/lib/utils";
+import { addString } from "@/utility/indexDB";
+import { SessionContext } from "@/hooks/use-key";
 
 const formSchema = z.object({
   username: z.string()
@@ -28,7 +31,8 @@ const formSchema = z.object({
   password: z.string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
   confirmPassword: z.string(),
   key: z.string()
 }).refine(data => data.password === data.confirmPassword, {
@@ -51,24 +55,30 @@ const Register: React.FC = () => {
 	const navigate = useNavigate();
 	const [registerError, setRegisterError] = useState(false);
 
+  const [_, pSetKey]: any = useContext(SessionContext);
   async function onSubmit(values: z.infer<typeof formSchema>) {
+
 		try {
+      const { publicKeyString, privateKeyString } = await generateRSAKeyPair();
+      const id = addString(privateKeyString);
+      pSetKey(id);
+
 			const payload = {
 				username: values.username,
 				email: values.email,
 				password:values.password,
-				key: values.key
+				key: publicKeyString
 			};
 
 			const res = await axios.post(`${BACKEND_API}/auth/register`, payload);
-
+      
 			if (res.status === 201) {
 				navigate('/login');
 			}
 		} catch (err) {
 			if (err instanceof AxiosError && err.status === 400) {
 				console.log('User already exists');
-				setRegisterError(p => true);
+				setRegisterError(true);
 			}
 			console.log({ values, err });
 		}
@@ -155,24 +165,6 @@ const Register: React.FC = () => {
                       placeholder="••••••••"
                       {...field}
                       autoComplete="new-password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-				<FormField
-              control={form.control}
-              name="key"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Public Key</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="ssh 4567897654-AFHGVSJFB"
-                      {...field}
-											autoComplete="public key"
                     />
                   </FormControl>
                   <FormMessage />
