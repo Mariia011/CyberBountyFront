@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { create } from 'ipfs-http-client';
 import Decryptor from './Decryptor';
 import { getIPFSFileBase64 } from '@/lib/utils';
 import { DecryptInfoContext } from '@/hooks/decrypt-info';
+import { IPFS_API, IPFS_PORT } from '@/constants';
 
 const Receiver: React.FC = () => {
 
@@ -18,10 +19,17 @@ const Receiver: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
-	
+
+	useEffect(() => {
+		setIv(decryptInfo.iv);
+		setCid(decryptInfo.cid);
+		setEncryptedAesKey(decryptInfo.encKey);
+		setPrivateKey(decryptInfo.privateKey);
+	}, []);
+
   const ipfs = create({
-    host: "localhost",
-    port: 5001,
+    host: IPFS_API,
+    port: IPFS_PORT,
     protocol: "http"
   });
 
@@ -31,10 +39,10 @@ const Receiver: React.FC = () => {
       setError(null);
 
       // Get encrypted file from IPFS
-      const encryptedFile = await getIPFSFileBase64(ipfs, decryptInfo.cid);
+      const encryptedFile = await getIPFSFileBase64(ipfs, cid);
       
       // Decrypt the file
-      const decryptedBlob = await Decryptor(encryptedFile, decryptInfo.encKey, decryptInfo.iv, decryptInfo.privateKey);
+      const decryptedBlob = await Decryptor(encryptedFile, encryptedAesKey, iv, privateKey);
       
       setDecryptedFile(decryptedBlob);
     } catch (err) {
@@ -65,7 +73,7 @@ const Receiver: React.FC = () => {
           <Label htmlFor="cid">IPFS CID</Label>
           <Input
             id="cid"
-            value={decryptInfo.cid}
+            value={cid}
             onChange={(e) => setCid(e.target.value)}
             placeholder="Enter IPFS Content ID (CID)"
           />
@@ -75,7 +83,7 @@ const Receiver: React.FC = () => {
           <Label htmlFor="encryptedAesKey">Encrypted AES Key (Base64)</Label>
           <Input
             id="encryptedAesKey"
-            value={decryptInfo.encKey}
+            value={encryptedAesKey}
             onChange={(e) => setEncryptedAesKey(e.target.value)}
             placeholder="Enter encrypted AES key"
           />
@@ -85,7 +93,7 @@ const Receiver: React.FC = () => {
           <Label htmlFor="iv">Initialization Vector (IV)</Label>
           <Input
             id="iv"
-            value={decryptInfo.iv}
+            value={iv}
             onChange={(e) => setIv(e.target.value)}
             placeholder="Enter initialization vector"
           />
@@ -95,7 +103,7 @@ const Receiver: React.FC = () => {
           <Label htmlFor="privateKey">Private Key (Base64)</Label>
           <Input
             id="privateKey"
-            value={decryptInfo.privateKey}
+            value={privateKey}
             onChange={(e) => setPrivateKey(e.target.value)}
             placeholder="Enter your private key"
             type="password"
@@ -106,7 +114,7 @@ const Receiver: React.FC = () => {
 
         <Button 
           onClick={handleDecrypt}
-          disabled={loading || !decryptInfo.cid || !decryptInfo.encKey || !decryptInfo.iv || !decryptInfo.privateKey}
+          disabled={loading || !cid || !encryptedAesKey || !iv || !privateKey}
         >
           {loading ? 'Decrypting...' : 'Decrypt File'}
         </Button>

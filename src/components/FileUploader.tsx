@@ -5,6 +5,7 @@ import { create } from "ipfs-http-client";
 import Encryptor from '@/components/Encryptor';
 import { base64ToUint8Array, generateRSAKeyPair } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';import { DecryptInfoContext } from '@/hooks/decrypt-info';
+import { IPFS_API, IPFS_PORT } from '@/constants';
 ;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
@@ -30,8 +31,8 @@ const FileUploader: React.FC = () => {
   const navigate = useNavigate();
 
   const ipfs = create({
-    host: "localhost",
-    port: 5001,
+    host: IPFS_API,
+    port: IPFS_PORT,
     protocol: "http"
   });
 
