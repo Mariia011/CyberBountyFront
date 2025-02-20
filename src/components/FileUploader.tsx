@@ -263,8 +263,8 @@ const FileUploader: React.FC = () => {
       const addedFile = await ipfs.add(encryptedUint8Array);
 
       const payload = {
-        encRandKey: eres.encryptedAesKey,
-        hashData: `${addedFile.path} ${eres.iv}`,
+        encRandKey: `${eres.encryptedAesKey} ${eres.iv}`,
+        hashData: addedFile.path,
         recipientsId: user.id,
       }
       const dambul = await axios.post(`${BACKEND_API}/file`, payload, {
@@ -278,7 +278,6 @@ const FileUploader: React.FC = () => {
 
       // Get sender's private key
       const privateKeyString = await retrieveDecryptedPrivateKey();
-      
       // Update decrypt context
       decryptInfoSet({
         iv: eres.iv,
@@ -287,7 +286,7 @@ const FileUploader: React.FC = () => {
         privateKey: privateKeyString
       });
 
-      navigate("/receiver");
+      navigate("/");
     } catch (err) {
       setError('Failed to share file. Please check the recipient email and try again.');
     } finally {

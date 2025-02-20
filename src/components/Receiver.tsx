@@ -1,31 +1,66 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { create } from 'ipfs-http-client';
+import React, {useContext, useEffect, useState} from 'react';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {create} from 'ipfs-http-client';
 import Decryptor from './Decryptor';
-import { getIPFSFileBase64 } from '@/lib/utils';
-import { DecryptInfoContext } from '@/hooks/decrypt-info';
-import { IPFS_API, IPFS_PORT } from '@/constants';
+import {getIPFSFileBase64} from '@/lib/utils';
+import {DecryptInfoContext} from '@/hooks/decrypt-info';
+import {BACKEND_API, IPFS_API, IPFS_PORT} from '@/constants';
+import axios from "axios";
 
 const Receiver: React.FC = () => {
 
-	const [cid, setCid] = useState('');
-	const [encryptedAesKey, setEncryptedAesKey] = useState('');
-	const [iv, setIv] = useState('');
-	const [privateKey, setPrivateKey] = useState('');
-	const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
+  const [cid, setCid] = useState('');
+  const [encryptedAesKey, setEncryptedAesKey] = useState('');
+  const [iv, setIv] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
+  const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
 
-	useEffect(() => {
-		setIv(decryptInfo.iv);
-		setCid(decryptInfo.cid);
-		setEncryptedAesKey(decryptInfo.encKey);
-		setPrivateKey(decryptInfo.privateKey);
-	}, []);
+  async function foo() {
+    // console.log('token ', sessionStorage.getItem("token"));
+    const res = await axios.get(`${BACKEND_API}/file`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`
+      }
+    });
+
+    console.log({ res });
+
+    const fileInfo = res.data[0];
+
+    const tmp = {
+      cid: fileInfo?.hashData,
+      iv: fileInfo?.encRandKey?.split(' ')[1],
+      encKey: fileInfo?.encRandKey,
+      privateKey: decryptInfo?.privateKey,
+    }
+
+    return tmp;
+  }
+
+  useEffect(() => {
+    async function fetchDecryptInfo() {
+      const tmp = await foo();
+      setDecryptInfo(tmp);
+      console.log({tmp})
+    }
+    fetchDecryptInfo();
+  }, []);
+
+
+  useEffect(() => {
+    if (decryptInfo) {
+      setIv(decryptInfo.iv || '');
+      setCid(decryptInfo.cid || '');
+      setEncryptedAesKey(decryptInfo.encKey || '');
+      setPrivateKey(decryptInfo.privateKey || '');
+    }
+  }, [decryptInfo]);
 
   const ipfs = create({
     host: IPFS_API,
@@ -39,10 +74,10 @@ const Receiver: React.FC = () => {
       setError(null);
       // Get encrypted file from IPFS
       const encryptedFile = await getIPFSFileBase64(ipfs, cid);
-      
+
       // Decrypt the file
       const decryptedBlob = await Decryptor(encryptedFile, encryptedAesKey, iv, privateKey);
-      
+
       setDecryptedFile(decryptedBlob);
     } catch (err) {
       console.error('Decryption failed:', err);
@@ -54,7 +89,7 @@ const Receiver: React.FC = () => {
 
   const handleDownload = () => {
     if (!decryptedFile) return;
-    
+
     const url = URL.createObjectURL(decryptedFile);
     const a = document.createElement('a');
     a.href = url;
@@ -111,7 +146,7 @@ const Receiver: React.FC = () => {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <Button 
+        <Button
           onClick={handleDecrypt}
           disabled={loading || !cid || !encryptedAesKey || !iv || !privateKey}
         >
