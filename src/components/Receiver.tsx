@@ -10,14 +10,15 @@ import Decryptor from "@/components/Decryptor";
 
 const Receiver: React.FC = () => {
 
-  const [fileInfo, setFileInfo] = useState<any>(null);
-  const [cid, setCid] = useState('');
-  const [encryptedAesKey, setEncryptedAesKey] = useState('');
-  const [iv, setIv] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fileType, setFileType] = useState<string>("plain/text");
+	const [cid, setCid] = useState('');
+	const [encryptedAesKey, setEncryptedAesKey] = useState('');
+	const [iv, setIv] = useState('');
+	const [privateKey, setPrivateKey] = useState('');
+	const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [decryptInfo, _setDecryptInfo] = useContext(DecryptInfoContext);
 
 
   const ipfs = create({

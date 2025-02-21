@@ -188,9 +188,11 @@ const FileUploader: React.FC = () => {
   const [recipientEmail, setRecipientEmail] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  // const [decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
-  // const navigate = useNavigate();
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
+  const navigate = useNavigate();
 
   const ipfs = create({
     host: IPFS_API,

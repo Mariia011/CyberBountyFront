@@ -5,7 +5,7 @@
 
 ## Description
 
-CyberBounty-frontend
+CyberBounty-frontend 
 
 # Requirements
 
@@ -15,6 +15,7 @@ CyberBounty-frontend
 ## Run the project
 
 ```bash
+cat ./.env.example > .env
 npm i
 npm run build
 npm run preview
