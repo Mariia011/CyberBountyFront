@@ -6,7 +6,7 @@ const Homepage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
-        navigate("/login");
+        navigate("/register");
     };
 
     return (

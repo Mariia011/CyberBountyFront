@@ -161,17 +161,16 @@
 // export default FileUploader;
 
 import axios from "axios";
-import React, { useContext, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { create } from "ipfs-http-client";
 import Encryptor from '@/components/Encryptor';
 import { base64ToUint8Array, isEmail } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { DecryptInfoContext } from '@/hooks/decrypt-info';
+// import { useNavigate } from 'react-router-dom';
+// import { DecryptInfoContext } from '@/hooks/decrypt-info';
 import { BACKEND_API, IPFS_API, IPFS_PORT } from '@/constants';
-import { retrieveDecryptedPrivateKey } from '@/lib/sessionStorageKeyManager';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024; // 10GB in bytes
 
@@ -190,8 +189,8 @@ const FileUploader: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
-  const navigate = useNavigate();
+  // const [decryptInfo, decryptInfoSet] = useContext(DecryptInfoContext);
+  // const navigate = useNavigate();
 
   const ipfs = create({
     host: IPFS_API,
