@@ -1,6 +1,5 @@
-import axios from "axios";
-import { BACKEND_API, algorithm } from "@/constants";
-import { isEmail, base64ToArrayBuffer, arrayBufferToBase64 } from "@/lib/utils";
+import { algorithm } from "@/constants";
+import { base64ToArrayBuffer, arrayBufferToBase64 } from "@/lib/utils";
 
 // const Encryptor = async (file: File, user: string) => {
 //   try {
