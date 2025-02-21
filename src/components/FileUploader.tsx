@@ -245,7 +245,7 @@ const FileUploader: React.FC = () => {
 
     try {
       // Fetch recipient's public key
-      console.log('localstroage token: ', sessionStorage.getItem("token"));
+      console.log('sessionstorage token: ', sessionStorage.getItem("token"));
       const { data } = await axios.get(`${BACKEND_API}/users/?email=${recipientEmail}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`
@@ -264,7 +264,7 @@ const FileUploader: React.FC = () => {
 
       const payload = {
         encRandKey: eres.encryptedAesKey,
-        hashData: `${addedFile.path} ${eres.iv}`,
+        hashData: `${addedFile.path} ${eres.iv} ${eres.filetype}`,
         recipientsId: user.id,
       }
       const dambul = await axios.post(`${BACKEND_API}/file`, payload, {
@@ -277,17 +277,17 @@ const FileUploader: React.FC = () => {
       
 
       // Get sender's private key
-      const privateKeyString = await retrieveDecryptedPrivateKey();
+      // const privateKeyString = await retrieveDecryptedPrivateKey();
       
-      // Update decrypt context
-      decryptInfoSet({
-        iv: eres.iv,
-        encKey: eres.encryptedAesKey,
-        cid: addedFile.path,
-        privateKey: privateKeyString
-      });
+      // // Update decrypt context
+      // decryptInfoSet({
+      //   iv: eres.iv,
+      //   encKey: eres.encryptedAesKey,
+      //   cid: addedFile.path,
+      //   privateKey: privateKeyString
+      // });
 
-      navigate("/receiver");
+      // navigate("/receiver");
     } catch (err) {
       setError('Failed to share file. Please check the recipient email and try again.');
     } finally {

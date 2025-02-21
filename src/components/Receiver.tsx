@@ -1,131 +1,121 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { create } from 'ipfs-http-client';
-import Decryptor from './Decryptor';
 import { getIPFSFileBase64 } from '@/lib/utils';
-import { DecryptInfoContext } from '@/hooks/decrypt-info';
-import { IPFS_API, IPFS_PORT } from '@/constants';
+import { BACKEND_API, IPFS_API, IPFS_PORT } from '@/constants';
+import axios from 'axios';
+import { retrieveDecryptedPrivateKey } from '@/lib/sessionStorageKeyManager';
+import Decryptor from "@/components/Decryptor";
 
 const Receiver: React.FC = () => {
 
-	const [cid, setCid] = useState('');
-	const [encryptedAesKey, setEncryptedAesKey] = useState('');
-	const [iv, setIv] = useState('');
-	const [privateKey, setPrivateKey] = useState('');
-	const [decryptedFile, setDecryptedFile] = useState<Blob | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [decryptInfo, setDecryptInfo] = useContext(DecryptInfoContext);
+  const [fileInfo, setFileInfo] = useState<any>(null);
+  const [cid, setCid] = useState('');
+  const [encryptedAesKey, setEncryptedAesKey] = useState('');
+  const [iv, setIv] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<string>("plain/text");
 
-	useEffect(() => {
-		setIv(decryptInfo.iv);
-		setCid(decryptInfo.cid);
-		setEncryptedAesKey(decryptInfo.encKey);
-		setPrivateKey(decryptInfo.privateKey);
-	}, []);
 
   const ipfs = create({
     host: IPFS_API,
     port: IPFS_PORT,
-    protocol: "http"
+    protocol: 'http'
   });
 
-  const handleDecrypt = async () => {
+
+  const handleGetFileInfo = async () => {
     try {
       setLoading(true);
       setError(null);
-      // Get encrypted file from IPFS
-      const encryptedFile = await getIPFSFileBase64(ipfs, cid);
-      
-      // Decrypt the file
-      const decryptedBlob = await Decryptor(encryptedFile, encryptedAesKey, iv, privateKey);
-      
-      setDecryptedFile(decryptedBlob);
+      const response = await axios.get(`${BACKEND_API}/file/`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      });
+    
+      const info = response.data[0];
+      setFileInfo(info);
+
+    
+    
+      const [fCid, fIv, fType] = info.hashData.split(" ");
+      setCid(fCid);
+      setIv(fIv);
+      setFileType(fType);
+      setEncryptedAesKey(info.encRandKey);
+      const pk = await retrieveDecryptedPrivateKey();
+      setPrivateKey(pk);
     } catch (err) {
-      console.error('Decryption failed:', err);
-      setError('Failed to decrypt file. Please check your inputs and try again.');
+      console.error('Error fetching file info:', err);
+      setError('Error fetching file info.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDownload = () => {
-    if (!decryptedFile) return;
+
+  const handleDecryptAndDownload = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!cid) {
+        setError('CID is missing.');
+        return;
+      }
+
     
-    const url = URL.createObjectURL(decryptedFile);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `decrypted-${Date.now()}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      const encryptedFile = await getIPFSFileBase64(ipfs, cid);
+      const decryptedFile = await Decryptor(encryptedFile, encryptedAesKey, iv, privateKey);
+    
+    
+    
+    
+      console.log("filetype:", fileType);
+      const decryptedBlob = new Blob([decryptedFile], { "type": fileType });
+
+    
+      const url = URL.createObjectURL(decryptedBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `decrypted-${Date.now()}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error during decryption and download:', err);
+      setError('Error during decryption and download.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Card className="p-4 border-2 rounded-md border-gray-300">
       <CardContent className="flex flex-col gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="cid">IPFS CID</Label>
-          <Input
-            id="cid"
-            value={cid}
-            onChange={(e) => setCid(e.target.value)}
-            placeholder="Enter IPFS Content ID (CID)"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="encryptedAesKey">Encrypted AES Key (Base64)</Label>
-          <Input
-            id="encryptedAesKey"
-            value={encryptedAesKey}
-            onChange={(e) => setEncryptedAesKey(e.target.value)}
-            placeholder="Enter encrypted AES key"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="iv">Initialization Vector (IV)</Label>
-          <Input
-            id="iv"
-            value={iv}
-            onChange={(e) => setIv(e.target.value)}
-            placeholder="Enter initialization vector"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="privateKey">Private Key (Base64)</Label>
-          <Input
-            id="privateKey"
-            value={privateKey}
-            onChange={(e) => setPrivateKey(e.target.value)}
-            placeholder="Enter your private key"
-            type="password"
-          />
-        </div>
-
-        {error && <p className="text-red-500">{error}</p>}
-
-        <Button 
-          onClick={handleDecrypt}
-          disabled={loading || !cid || !encryptedAesKey || !iv || !privateKey}
-        >
-          {loading ? 'Decrypting...' : 'Decrypt File'}
+        <Button onClick={handleGetFileInfo} disabled={loading}>
+          {loading ? 'Fetching file info...' : 'Get File Info'}
         </Button>
 
-        {decryptedFile && (
-          <div className="mt-4">
-            <p className="text-green-600 mb-2">File decrypted successfully!</p>
-            <Button variant="outline" onClick={handleDownload}>
-              Download Decrypted File
-            </Button>
-          </div>
+        {fileInfo && (
+          <p className="text-green-600">
+            File info retrieved: {fileInfo.filename || 'File available'}
+          </p>
         )}
+
+        <Button
+          onClick={handleDecryptAndDownload}
+          disabled={loading || !cid || !encryptedAesKey || !iv || !privateKey}
+        >
+          {loading ? 'Processing...' : 'Decrypt and Download'}
+        </Button>
+
+        {error && <p className="text-red-500">{error}</p>}
       </CardContent>
     </Card>
   );
